@@ -1,0 +1,32 @@
+VERSION 1.0 CLASS
+BEGIN
+  MultiUse = -1  'True
+END
+Attribute VB_Name = "ThisWorkbook"
+Attribute VB_GlobalNameSpace = False
+Attribute VB_Creatable = False
+Attribute VB_PredeclaredId = True
+Attribute VB_Exposed = True
+Option Explicit
+Private Sub Workbook_WindowActivate(ByVal Wn As Window)
+    If ActiveSheet.Name = "入力フォーム" Then
+        If Sheets("入力フォーム").Range("_レイアウト編集モード") = "ON" Then Exit Sub
+        Select Case Application.CutCopyMode
+            Case xlCopy, xlCut
+                MsgBox "入力フォームへの貼付操作は禁止されています"
+                Application.CutCopyMode = False
+        End Select
+    End If
+End Sub
+Private Sub Workbook_SheetDeactivate(ByVal Sh As Object)
+    If Sh.Name = "入力フォーム" Then
+        With Sheets("入力フォーム")
+            If 編集差分確認() = "差分あり" Then
+                Select Case MsgBox("台帳更新が実行されていません" & vbCrLf & vbCrLf & "編集内容をクリアしてよろしいですか？", vbYesNo)
+                    Case vbYes: Call 台帳戻し(0)
+                    Case vbNo: Sh.Activate
+                End Select
+            End If
+        End With
+    End If
+End Sub

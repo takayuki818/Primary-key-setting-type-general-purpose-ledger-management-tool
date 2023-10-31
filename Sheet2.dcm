@@ -1,0 +1,58 @@
+VERSION 1.0 CLASS
+BEGIN
+  MultiUse = -1  'True
+END
+Attribute VB_Name = "Sheet2"
+Attribute VB_GlobalNameSpace = False
+Attribute VB_Creatable = False
+Attribute VB_PredeclaredId = True
+Attribute VB_Exposed = True
+Option Explicit
+Private Sub Worksheet_SelectionChange(ByVal Target As Range)
+    If Sheets("入力フォーム").Range("_レイアウト編集モード") = "ON" Then Exit Sub
+    Select Case Application.CutCopyMode
+        Case xlCopy
+        Case xlCut
+            MsgBox "入力シート上での切り取り操作は禁止されています"
+            Application.CutCopyMode = False
+    End Select
+End Sub
+Private Sub Worksheet_Deactivate()
+    If Sheets("入力フォーム").Range("_レイアウト編集モード") = "ON" Then Exit Sub
+    Select Case Application.CutCopyMode
+        Case xlCopy
+        Case xlCut
+            MsgBox "入力シートからの切り取り操作は禁止されています"
+            Application.CutCopyMode = False
+    End Select
+End Sub
+Private Sub Worksheet_Activate()
+    If Sheets("入力フォーム").Range("_レイアウト編集モード") = "ON" Then Exit Sub
+    Select Case Application.CutCopyMode
+        Case xlCopy, xlCut
+            MsgBox "入力フォームへの貼付操作は禁止されています"
+            Application.CutCopyMode = False
+    End Select
+End Sub
+Private Sub Worksheet_Change(ByVal Target As Range)
+    Dim 鍵1(1 To 2), 鍵2(1 To 2), 鍵3(1 To 2)
+    Dim 文 As String
+    With Sheets("入力フォーム")
+        Call 主キー取得(鍵1, 鍵2, 鍵3)
+        If 鍵1(1) <> "" Then If Target.Address = .Range(鍵1(1)).Address Then Call 台帳戻し(0)
+        If 鍵2(1) <> "" Then If Target.Address = .Range(鍵2(1)).Address Then Call 台帳戻し(0)
+        If 鍵3(1) <> "" Then If Target.Address = .Range(鍵3(1)).Address Then Call 台帳戻し(0)
+        Select Case Target.Address
+            Case .Range("_レイアウト編集モード").Address
+                Select Case Target
+                    Case "ON"
+                        文 = "レイアウト編集モードをONに切り替えました" & vbCrLf & vbCrLf & "シート保護解除＆セルの切り取り操作が許容されます" & vbCrLf & "作業完了後は必ずモードをOFFに切り替えてください"
+                        .Unprotect
+                    Case "OFF"
+                        文 = "レイアウト編集モードをOFFに切り替えました" & vbCrLf & vbCrLf & "シート保護開始＆セルの切り取り操作が禁止されます"
+                        .Protect
+                End Select
+                MsgBox 文
+        End Select
+    End With
+End Sub
