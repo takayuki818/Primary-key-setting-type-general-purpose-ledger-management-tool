@@ -21,12 +21,18 @@ End Sub
 Private Sub Workbook_SheetDeactivate(ByVal Sh As Object)
     If Sh.Name = "入力フォーム" Then
         With Sheets("入力フォーム")
-            If 編集差分確認() = "差分あり" Then
-                Select Case MsgBox("台帳更新が実行されていません" & vbCrLf & vbCrLf & "編集内容をクリアしてよろしいですか？", vbYesNo)
-                    Case vbYes: Call 台帳戻し(0)
-                    Case vbNo: Sh.Activate
-                End Select
-            End If
+            Select Case 編集差分確認()
+                Case "未登録"
+                    Select Case MsgBox("台帳登録が実行されていません" & vbCrLf & vbCrLf & "編集内容をクリアしてよろしいですか？", vbYesNo)
+                        Case vbYes: Call 入力フォームオールクリア
+                        Case vbNo: Sh.Activate
+                    End Select
+                Case "差分あり"
+                    Select Case MsgBox("台帳更新が実行されていません" & vbCrLf & vbCrLf & "編集内容をクリアしてよろしいですか？", vbYesNo)
+                        Case vbYes: Call 台帳戻し(0)
+                        Case vbNo: Sh.Activate
+                    End Select
+            End Select
         End With
     End If
 End Sub
