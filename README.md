@@ -1,4 +1,3 @@
-# Primary-key-setting-type-general-purpose-ledger-management-tool
 # Name
 【主キー設定型】汎用台帳管理ツール
 # Overview
